@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
 
-  OPENAI_API_KEY: "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",
+  OPENAI_API_KEY: "",
 
   temperature: 0.0,
   max_tokens: 250,
