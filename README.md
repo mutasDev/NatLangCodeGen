@@ -62,5 +62,18 @@ Currently, four Features are enabled:
            
         For the meaning of those scores and flags, refer to the [project report](https://project.mutas.dev)
         
-           
-   
+## JSON Formats
+# Input Format of Multi Prompts
+The Multiprompt Feature creates completions via the GPT-3 model. It was used to create code snippets from natural language descriptions.
+The iinput json files should contain the following information:
+        + 
+
+
+# Output Format of Scenario Translation
+The Scenario Translation Feature creates completions via the Codex model. It was used to natural language descriptions from code snippets.
+The output json files contains the following information:
+        + *text* : the generated natural language description
+        + *language* : the programming language of the source file translated (if possible)
+        + *name* : file name incl. the directory
+        + *vulnerable* : flag set based on existing CodeQL Result files in the directory of the code snippet, undefined if no results file found
+        + a score field for each of the four scores *naturalness*, *expressiveness*, *contentadequacy*, *conciseness*, all set to empty value
