@@ -5,15 +5,15 @@ This web application was used to perform the research described in [this](https:
 
 
 ## Installation and Starting the Web Application
-    Requirements: 
-      + Node, including npm
-      + Angular
+# Requirements: 
+   * Node, including npm (https://nodejs.org/en/)
+   * Angular (https://angular.io)
       
-    Installation:
-        1. Check out the repository via `git clone https://github.com/mutasDev/NatLangCodeGen.git`
-        2. in the repositories home directory execute `npm install`
-        3. in the repositories home directory execute `ng serve`
-           This will compile and start the application, access the application in your browser under `localhost:4200`
+# Installation:
+   1. Check out the repository via `git clone https://github.com/mutasDev/NatLangCodeGen.git`
+   2. in the repositories home directory execute `npm install`
+   3. in the repositories home directory execute `ng serve`
+      This will compile and start the application, access the application in your browser under `localhost:4200`
            
 
 ## Configuration 
@@ -59,6 +59,7 @@ Currently, four Features are enabled:
            + Content Adequacy Score
            + Conciseness Score
            + Vulnerability Flag
+           
         For the meaning of those scores and flags, refer to the [project report](https://project.mutas.dev)
         
            
