@@ -4,12 +4,12 @@ This project includes the source code of a web application used for communicatio
 This web application was used to perform the research described in [this](https://project.mutas.dev) research project.
 
 
-## Installation and Starting the Web Application
-# Requirements: 
+# Installation and Starting the Web Application
+## Requirements: 
    * Node, including npm (https://nodejs.org/en/)
    * Angular (https://angular.io)
       
-# Installation:
+## Installation:
    1. Check out the repository via `git clone https://github.com/mutasDev/NatLangCodeGen.git`
    2. in the repositories home directory execute `npm install`
    3. in the repositories home directory execute `ng serve`
@@ -29,7 +29,7 @@ This web application was used to perform the research described in [this](https:
  The parameters are explained best in the [OpenAI Playground](https://beta.openai.com/playground) on the right side.
  The two paremeters *pretext* and *posttext* are string fields that are added to each prompt before or after the "main"prompt, respectively.
 
-## Functionality
+# Functionality
 The web application offers several options for handling requests to and from the OpenAI-API.
 
 Currently, four Features are enabled:
@@ -66,15 +66,15 @@ Currently, four Features are enabled:
            
         For the meaning of those scores and flags, refer to the [project report](https://project.mutas.dev)
         
-## JSON Formats
-# Input Format of Multi Prompts
+# JSON Formats
+## Input Format of Multi Prompts
 The Multiprompt Feature creates completions via the GPT-3 model. It was used to create code snippets from natural language descriptions.
 The input json files should contain the following information:
         + *text* : the natural language description of the code to be generated
         + *language* : the programming language the code should be generated in (currently supported: Java, C, Python, C++, Javascript)
         + *name* (optional) : name of the file to be generated
 
-# Output Format of Scenario Translation
+## Output Format of Scenario Translation
 The Scenario Translation Feature creates completions via the Codex model. It was used to natural language descriptions from code snippets.
 The output json files contains the following information:
         + *text* : the generated natural language description
