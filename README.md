@@ -25,6 +25,9 @@ This web application was used to perform the research described in [this](https:
  
  
  In this environment file, the parameters for the requests are also configurable. Parameters without `nl_` before their name refer to the parameters for GPT-3 requests and parameters with the `nl_` prefix are used in the request to the Codex model.
+ 
+ The parameters are explained best in the [OpenAI Playground](https://beta.openai.com/playground) on the right side.
+ The two paremeters *pretext* and *posttext* are string fields that are added to each prompt before or after the "main"prompt, respectively.
 
 ## Functionality
 The web application offers several options for handling requests to and from the OpenAI-API.
@@ -44,6 +47,7 @@ Currently, four Features are enabled:
       
    3. Scenario Translation
       + Sends multiple completion requests to the Codex API sequentially and stores the results in generated json files
+      + uses the parameters with nl_ prefix from the [environment file](/src/environments/environment.ts)
       + returns a zip archive containing the generated responses in json formats, exact json format see below
       + The *Generate* button starts the sequential handling of the requests
       + As the Codex API has a different limit than the GPT-3 API, a rate limiting was enabled vie the in browser debugger being called after every 100 requests. When that occurs, wait a little bit (around 1-2 minutes should suffice) and press continue on the debugger window. This will continue the sequential processing of the requests. Not waiting for long enough can result in the crash of the request process and then one needs to restart the process with all requests.
@@ -65,9 +69,10 @@ Currently, four Features are enabled:
 ## JSON Formats
 # Input Format of Multi Prompts
 The Multiprompt Feature creates completions via the GPT-3 model. It was used to create code snippets from natural language descriptions.
-The iinput json files should contain the following information:
-        + 
-
+The input json files should contain the following information:
+        + *text* : the natural language description of the code to be generated
+        + *language* : the programming language the code should be generated in (currently supported: Java, C, Python, C++, Javascript)
+        + *name* (optional) : name of the file to be generated
 
 # Output Format of Scenario Translation
 The Scenario Translation Feature creates completions via the Codex model. It was used to natural language descriptions from code snippets.
