@@ -10,14 +10,55 @@
       (change)="uploadFile($event)"
     />
   </div>
+
+  <!--   Model Selection   -->
   <div style="text-align: center">
+    <br/>
+    <label style="font-weight: bold;">Model Selection</label><br/>
     <mat-radio-group aria-label="Select Model" [(ngModel)]="generationModel">
-      <mat-radio-button value="1">Codex</mat-radio-button>
+      <mat-radio-button value="1" style="margin-right: 10px">Codex</mat-radio-button>
       <mat-radio-button value="2">GPT-3</mat-radio-button>
     </mat-radio-group>
   </div>
+
+  <!--   Language Selection   -->
   <div style="text-align: center">
-    <button [disabled]="generationModel==0" style="margin-top: 10px" (click)="generateMultiPrompts()">
+    <br />
+    <label style="font-weight: bold;">Language Mode </label><br />
+    <mat-radio-group
+      aria-label="Language Overwrite"
+      [(ngModel)]="languageOverwrite"
+    >
+      <mat-radio-button value="false" style="margin-right: 10px">Keep Original</mat-radio-button>
+      <mat-radio-button value="true">Overwrite</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div style="text-align: center">
+    <br />
+    <label style="font-weight: bold;">Language Selection </label><br />
+    <mat-radio-group
+      aria-label="Select Language"
+      [(ngModel)]="generationLanguage"
+      (ngModelChange)="log(generationLanguage)"
+    >
+      <mat-radio-button
+        style="margin-right:10px;"
+        *ngFor="let language of languageEnum | keyvalue"
+        value="{{language.key}}"
+        >{{ language.value }}</mat-radio-button
+      >
+    </mat-radio-group>
+  </div>
+
+  <!--   Start and Save   -->
+
+  <div style="text-align: center">
+    <button
+      [disabled]="generationModel == 0"
+      style="margin-top: 10px"
+      (click)="generateMultiPrompts()"
+    >
       Generate
     </button>
   </div>

@@ -13,9 +13,12 @@ import { OAIPrompt } from 'src/app/model/prompt';
 })
 export class MultiPromptComponent implements OnInit {
   constructor(private openai: OpenAIService) {}
-
+  public languageEnum = ProgrammingLanguage;
   private jszip: JSZip = new JSZip();
   public generationModel: number = 0;
+  public languageOverwrite: boolean = false;
+  public generationLanguage: ProgrammingLanguage= ProgrammingLanguage.PYTHON;
+
   ngOnInit(): void {}
 
   /**
@@ -59,6 +62,9 @@ export class MultiPromptComponent implements OnInit {
     this.jszip.generateAsync({ type: 'blob' }).then(function (content) {
       saveAs(content, 'results.zip');
     });
+  }
+  log(txt: any) {
+    console.log(txt);
   }
 }
 /**
@@ -104,4 +110,6 @@ function buildGeneratedCode(
   let genArray: string = prompt.text ? prompt.text.split('\n').join(delimit) : (delimit +  'empty');
   gen = genArray + '\n' + (result ? result : 'empty');
   return gen;
+
+
 }
