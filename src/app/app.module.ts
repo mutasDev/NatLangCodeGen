@@ -12,6 +12,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DebugComponent } from './views/debug/debug.component';
 import { ReportComponent } from './views/report/report.component';
+import { MatRadioModule} from '@angular/material/radio'
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { ReportComponent } from './views/report/report.component';
     MatTabsModule,
     MatDialogModule,
     MatProgressSpinnerModule,
+    MatRadioModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

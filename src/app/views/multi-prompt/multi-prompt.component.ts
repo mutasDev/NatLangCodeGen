@@ -15,6 +15,7 @@ export class MultiPromptComponent implements OnInit {
   constructor(private openai: OpenAIService) {}
 
   private jszip: JSZip = new JSZip();
+  public generationModel: number = 0;
   ngOnInit(): void {}
 
   /**
@@ -31,7 +32,7 @@ export class MultiPromptComponent implements OnInit {
     this.jszip = new JSZip();
     this.jszip = this.jszip.file('info.txt', getEnvText());
     console.log("start");
-    this.openai.generateMultiPrompts().then(() => {
+    this.openai.generateMultiPrompts(this.generationModel).then(() => {
       console.log(this.openai.results);
     });
   }

@@ -45,8 +45,12 @@ export class OpenAIService {
    * @param input snippet to be completed/handled
    * @returns best result from the AI
    */
-  public async generatePrompt(input: string) {
-    let response = await openai.createCompletion('text-davinci-002', {
+  public async generatePrompt(input: string, model: number) {
+    let modeltext: string = '';
+    if (model == 1) modeltext = 'code-davinci-002';
+    else if (model == 2) modeltext = 'text-davinci-002';
+    else return 'CONFIG_ERROR';
+    let response = await openai.createCompletion(modeltext, {
       prompt: input,
       temperature: environment.temperature,
       max_tokens: environment.max_tokens,
@@ -71,7 +75,6 @@ export class OpenAIService {
   uploadFile(event: any) {
     this.selectedFile = event.target.files[0];
     const jsZip = new JSZip();
-
     jsZip.loadAsync(this.selectedFile).then((zip) => {
       this.jsonObj = [];
       Object.entries(zip.files).forEach((entry) => {
@@ -83,7 +86,10 @@ export class OpenAIService {
           fileName.includes('experiment') &&
           file.name.endsWith('.json')
         ) {
+          console.log('file found?');
+          console.log('f:', file);
           file.async('string').then((prompt: string) => {
+            console.log('prompt: ', prompt);
             if (this.filtered.length < Object.keys(zip.files).length) {
               let lang: ProgrammingLanguage;
               let obj: OAIPrompt = JSON.parse(prompt);
@@ -124,7 +130,7 @@ export class OpenAIService {
    *
    */
   generateSinglePrompt(input: string) {
-    return this.generatePrompt(input);
+    return this.generatePrompt(input, 1);
   }
 
   /**
@@ -132,7 +138,7 @@ export class OpenAIService {
    * sequentially handles every entity in the jsonObj member variable
    * stores the results in the results member variable
    */
-  generateMultiPrompts(): Promise<any> {
+  generateMultiPrompts(model: number): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.jsonObj.length > 0) {
         console.log(this.jsonObj.length);
@@ -142,7 +148,8 @@ export class OpenAIService {
             '\n' +
             prompt.text +
             '\n' +
-            environment.posttext.replace('[PROGLANG]', prompt.language)
+            environment.posttext.replace('[PROGLANG]', prompt.language),
+          model
         )
           .then((gen) => {
             console.log('added' + gen);
@@ -154,7 +161,7 @@ export class OpenAIService {
           .then(() => {
             this.jsonObj.shift();
             console.log(this.results.length);
-            return this.generateMultiPrompts();
+            return this.generateMultiPrompts(model);
           });
       }
     });
@@ -431,7 +438,7 @@ function makeCSVString(obj: any): string {
   csvstring += obj.contentadequacy + ',';
   csvstring += obj.conciseness;
   if (obj.vulnerable != undefined) {
-    csvstring += ',' + obj.vulnerable ;
+    csvstring += ',' + obj.vulnerable;
   }
   return csvstring;
 }
