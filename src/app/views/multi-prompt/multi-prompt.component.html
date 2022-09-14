@@ -40,12 +40,12 @@
     <mat-radio-group
       aria-label="Select Language"
       [(ngModel)]="generationLanguage"
-      (ngModelChange)="log(generationLanguage)"
     >
       <mat-radio-button
         style="margin-right:10px;"
         *ngFor="let language of languageEnum | keyvalue"
         value="{{language.key}}"
+        [checked]="language.value=='Python'"
         >{{ language.value }}</mat-radio-button
       >
     </mat-radio-group>

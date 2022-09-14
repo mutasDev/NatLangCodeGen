@@ -17,8 +17,7 @@ export class MultiPromptComponent implements OnInit {
   private jszip: JSZip = new JSZip();
   public generationModel: number = 0;
   public languageOverwrite: boolean = false;
-  public generationLanguage: ProgrammingLanguage= ProgrammingLanguage.PYTHON;
-
+  public generationLanguage: ProgrammingLanguage = ProgrammingLanguage.PYTHON;
   ngOnInit(): void {}
 
   /**
@@ -35,7 +34,7 @@ export class MultiPromptComponent implements OnInit {
     this.jszip = new JSZip();
     this.jszip = this.jszip.file('info.txt', getEnvText());
     console.log("start");
-    this.openai.generateMultiPrompts(this.generationModel).then(() => {
+    this.openai.generateMultiPrompts(this.generationModel, this.generationLanguage, this.languageOverwrite).then(() => {
       console.log(this.openai.results);
     });
   }
@@ -98,6 +97,7 @@ function buildGeneratedCode(
   prompt: OAIPrompt,
   result: string | undefined
 ): string {
+  //todo: support for the other languages as well
   let gen: string = '';
   let delimit: string = '';
   switch(prompt.language) {
@@ -110,6 +110,4 @@ function buildGeneratedCode(
   let genArray: string = prompt.text ? prompt.text.split('\n').join(delimit) : (delimit +  'empty');
   gen = genArray + '\n' + (result ? result : 'empty');
   return gen;
-
-
 }

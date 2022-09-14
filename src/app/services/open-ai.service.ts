@@ -138,17 +138,24 @@ export class OpenAIService {
    * sequentially handles every entity in the jsonObj member variable
    * stores the results in the results member variable
    */
-  generateMultiPrompts(model: number): Promise<any> {
+  generateMultiPrompts(model: number, language: ProgrammingLanguage, overwrite: boolean): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.jsonObj.length > 0) {
         console.log(this.jsonObj.length);
         let prompt = this.jsonObj[0];
+        let lang: ProgrammingLanguage;
+        //if user wants overwrite or prompt has no language in its data, set language
+        if(overwrite || !prompt.language) {
+          lang = language;
+        } else {
+          lang = prompt.language;
+        }
         this.generatePrompt(
           environment.pretext +
             '\n' +
             prompt.text +
             '\n' +
-            environment.posttext.replace('[PROGLANG]', prompt.language),
+            environment.posttext.replace('[PROGLANG]', lang),
           model
         )
           .then((gen) => {
@@ -161,7 +168,7 @@ export class OpenAIService {
           .then(() => {
             this.jsonObj.shift();
             console.log(this.results.length);
-            return this.generateMultiPrompts(model);
+            return this.generateMultiPrompts(model, language, overwrite);
           });
       }
     });
