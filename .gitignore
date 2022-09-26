@@ -2,7 +2,7 @@
 
 
 #environment
-/environments
+openai/environments
 # compiled output
 /dist
 /tmp
