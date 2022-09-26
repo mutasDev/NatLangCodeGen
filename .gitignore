@@ -2,7 +2,7 @@
 
 
 #environment
-/openai/src/environments
+openai/src/environments/environment.ts
 # compiled output
 /dist
 /tmp
