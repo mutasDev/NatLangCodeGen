@@ -1,11 +1,13 @@
 /// re
 import { Injectable } from '@angular/core';
+import { MatRippleModule } from '@angular/material/core';
 import { platformBrowser } from '@angular/platform-browser';
 import { debug } from 'console';
 import { DH_CHECK_P_NOT_PRIME } from 'constants';
 //import { francAll } from 'franc';
 import * as JSZip from 'jszip';
 import { Configuration, OpenAIApi } from 'openai';
+import { stringify } from 'querystring';
 import { environment } from 'src/environments/environment';
 import { ProgrammingLanguage } from '../model/programming-language';
 import { OAIPrompt, ScenarioPrompt } from '../model/prompt';
@@ -20,7 +22,7 @@ const openai = new OpenAIApi(configuration);
   providedIn: 'root',
 })
 export class OpenAIService {
-  constructor() {}
+  constructor() { }
 
   selectedFile: any = null;
   selectedScenarioFile: any = null;
@@ -142,36 +144,78 @@ export class OpenAIService {
     return new Promise((resolve, reject) => {
       if (this.jsonObj.length > 0) {
         console.log(this.jsonObj.length);
-        let prompt = this.jsonObj[0];
-        let lang: ProgrammingLanguage;
-        //if user wants overwrite or prompt has no language in its data, set language
-        if(overwrite || !prompt.language) {
-          lang = language;
-        } else {
-          lang = prompt.language;
-        }
-        this.generatePrompt(
-          environment.pretext +
-            '\n' +
-            prompt.text +
-            '\n' +
-            environment.posttext.replace('[PROGLANG]', lang),
-          model
-        )
-          .then((gen) => {
-            console.log('added' + gen);
-            this.results.push({
-              prompt: prompt,
-              result: gen,
-            });
+        let prompts = this.jsonObj.splice(0, 20);
+        this.generatePromptBatch(prompts, model, language, overwrite)
+          .then((gen: { code: string | undefined, prompt: OAIPrompt }[]) => {
+            for (let i = 0; i < prompts.length; i++) {
+              this.results.push({
+                prompt: gen[i].prompt,
+                result: gen[i].code,
+              });
+            }
           })
-          .then(() => {
-            this.jsonObj.shift();
-            console.log(this.results.length);
+          .then(async () => {
+            this.counter += 20;
+            if (this.counter > 100) {
+              debugger;
+              this.counter = 0;
+            }
+            console.log(this.jsonObj.length + 'left')
             return this.generateMultiPrompts(model, language, overwrite);
-          });
+          })
       }
     });
+  }
+
+  public async generatePromptBatch(input: OAIPrompt[], model: number, lang: ProgrammingLanguage, overwrite: boolean) {
+
+
+    let modeltext: string = '';
+    if (model == 1) modeltext = 'code-davinci-002';
+    else if (model == 2) modeltext = 'text-davinci-002';
+    else {
+      console.log("CONFIG ERROR");
+      return [];
+    }
+
+
+    let responses = await openai.createCompletion(modeltext, {
+      prompt: input.map((entry) => {
+        console.log(entry.text);
+        return this.preparePromptText(entry.text, lang);
+      }),
+      temperature: environment.temperature,
+      max_tokens: environment.max_tokens,
+      top_p: environment.top_p,
+      frequency_penalty: environment.frequency_penalty,
+      presence_penalty: environment.presence_penalty,
+    });
+
+    let retResponses: { code: string | undefined, prompt: OAIPrompt}[] = [];
+    let choices = responses.data.choices;
+    console.table(choices);
+    choices?.forEach((resp) => {
+        let ret: {code: string| undefined, prompt: OAIPrompt  } = {code : undefined, prompt: {language: lang, text: ""}};
+        ret.code = resp.text;
+        if(resp.index) {
+          ret.prompt = input[resp.index];
+        }
+        retResponses.push(ret);
+    });
+
+    return retResponses;
+  }
+
+
+  public preparePromptText(text: string | undefined, lang: ProgrammingLanguage): string{
+    let modifiedPrompt: string = "";
+    if(!text) {
+      return ""
+    }
+    modifiedPrompt = text;
+    modifiedPrompt = environment.pretext + "\n" + modifiedPrompt + "\n" + environment.posttext;
+    modifiedPrompt = modifiedPrompt.replace("[PROGLANG]", lang);
+    return modifiedPrompt;
   }
 
   /**
@@ -198,8 +242,8 @@ export class OpenAIService {
           console.log(
             'lang: ',
             file.name.endsWith('py') ||
-              file.name.endsWith('java') ||
-              file.name.endsWith('.c')
+            file.name.endsWith('java') ||
+            file.name.endsWith('.c')
           );
         }
         if (
@@ -280,7 +324,7 @@ export class OpenAIService {
     });
   }
 
-  uploadDebugs(event: any): void {}
+  uploadDebugs(event: any): void { }
 
   generateDebugs(): Promise<any> {
     throw new Error('Method not implemented.');

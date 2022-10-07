@@ -18,6 +18,9 @@ export class MultiPromptComponent implements OnInit {
   public generationModel: number = 0;
   public languageOverwrite: boolean = false;
   public generationLanguage: ProgrammingLanguage = ProgrammingLanguage.PYTHON;
+
+  public prePrompt: string = environment.pretext;
+  public postPrompt: string = environment.posttext;
   ngOnInit(): void {}
 
   /**
