@@ -7,7 +7,6 @@ import { DH_CHECK_P_NOT_PRIME } from 'constants';
 //import { francAll } from 'franc';
 import * as JSZip from 'jszip';
 import { Configuration, OpenAIApi } from 'openai';
-import { stringify } from 'querystring';
 import { environment } from 'src/environments/environment';
 import { ProgrammingLanguage } from '../model/programming-language';
 import { OAIPrompt, ScenarioPrompt } from '../model/prompt';
@@ -156,7 +155,8 @@ export class OpenAIService {
           })
           .then(async () => {
             this.counter += 20;
-            if (this.counter > 100) {
+            console.log("cnt: ", this.counter);
+            if (this.counter >= 100) {
               debugger;
               this.counter = 0;
             }
@@ -181,7 +181,6 @@ export class OpenAIService {
 
     let responses = await openai.createCompletion(modeltext, {
       prompt: input.map((entry) => {
-        console.log(entry.text);
         return this.preparePromptText(entry.text, lang);
       }),
       temperature: environment.temperature,
