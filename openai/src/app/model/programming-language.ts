@@ -1,8 +1,7 @@
 export enum ProgrammingLanguage {
-  JAVA="Java",
-  PYTHON="Python",
+  JAVA="JAVA",
+  PYTHON="PYTHON",
   C="C",
-  CPP="C++",
-  TS="Typescript",
-  NG="Angular",
+  CPP="CPP",
+  TS="TS",
 }

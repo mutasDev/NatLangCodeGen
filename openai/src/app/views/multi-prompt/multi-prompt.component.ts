@@ -36,10 +36,16 @@ export class MultiPromptComponent implements OnInit {
   generateMultiPrompts(): void {
     this.jszip = new JSZip();
     this.jszip = this.jszip.file('info.txt', getEnvText());
-    console.log("start");
-    this.openai.generateMultiPrompts(this.generationModel, this.generationLanguage, this.languageOverwrite).then(() => {
-      console.log(this.openai.results);
-    });
+    console.log('start');
+    this.openai
+      .generateMultiPrompts(
+        this.generationModel,
+        this.generationLanguage,
+        this.languageOverwrite
+      )
+      .then(() => {
+        console.log(this.openai.results);
+      });
   }
 
   /**
@@ -50,13 +56,17 @@ export class MultiPromptComponent implements OnInit {
     let counter = 0;
     console.table(this.openai.results);
     this.openai.results.forEach((result: OAIResult) => {
-      console.log('res: ', result);
-      let lang: ProgrammingLanguage = ProgrammingLanguage.PYTHON;
-      this.jszip = this.jszip.file(
+      let lang: ProgrammingLanguage = this.generationLanguage;
+      let filenamestring: string =
         result.prompt.name != undefined
           ? result.prompt.name
           : counter.toLocaleString('en-US', { minimumIntegerDigits: 3 }) +
-              '_scen.py',
+            '_scen.helper'; // helper fileending because its removed in the next step for all non helper files.
+      let filenamestringarray = filenamestring.split('.');
+      filenamestringarray = filenamestringarray.slice(0, -1);
+      filenamestring = filenamestringarray[0] + "." + getFileNameEnding(lang);
+      this.jszip = this.jszip.file(
+        filenamestring,
         buildGeneratedCode(result.prompt, result.result)
       );
       counter++;
@@ -64,9 +74,6 @@ export class MultiPromptComponent implements OnInit {
     this.jszip.generateAsync({ type: 'blob' }).then(function (content) {
       saveAs(content, 'results.zip');
     });
-  }
-  log(txt: any) {
-    console.log(txt);
   }
 }
 /**
@@ -103,18 +110,36 @@ function buildGeneratedCode(
   //todo: support for the other languages as well
   let gen: string = '';
   let delimit: string = '';
-  switch(prompt.language) {
+  switch (prompt.language) {
     case ProgrammingLanguage.C:
       delimit = '\n//';
       break;
     case ProgrammingLanguage.PYTHON:
-      delimit = '\n#'
+      delimit = '\n#';
       break;
     case ProgrammingLanguage.JAVA:
-      delimit = '\n//'
+      delimit = '\n//';
       break;
   }
-  let genArray: string = prompt.text ? prompt.text.split('\n').join(delimit) : (delimit +  'empty');
+  let genArray: string = prompt.text
+    ? prompt.text.split('\n').join(delimit)
+    : delimit + 'empty';
   gen = genArray + '\n' + (result ? result : 'empty');
   return gen;
 }
+function getFileNameEnding(lang: ProgrammingLanguage) {
+  if(lang === ProgrammingLanguage.JAVA) {
+    return "java"
+  }
+  if(lang === ProgrammingLanguage.PYTHON) {
+    return "py"
+  }
+  if(lang === ProgrammingLanguage.C) {
+    return "c"
+  }
+  if(lang === ProgrammingLanguage.CPP) {
+    return "cpp"
+  }
+  return "txt"
+}
+
