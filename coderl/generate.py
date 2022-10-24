@@ -1,7 +1,4 @@
-from contextlib import nullcontext
-import fileinput
 from importlib.resources import path
-from re import I
 import zipfile
 import json
 from transformers import AutoTokenizer, T5ForConditionalGeneration
@@ -9,20 +6,20 @@ import sys
 
 
 def synthesise(text):
-    if (debug_mode):
-        print("Text: " + text + "\n")
     prompt = text + "\n Generated Code for the Program above: \n"
     input_ids = tokenizer(prompt, return_tensors="pt").input_ids
     generated_ids = model.generate(input_ids, max_length=128)
     if (debug_mode):
         print(
-            "GEN:" + tokenizer.decode(generated_ids[0], skip_special_tokens=True) + "\n")
+          "FOR PROMPT: " + text + "\n"
+        )
+        print(
+          "GEN:" + tokenizer.decode(generated_ids[0], skip_special_tokens=True) + "\n\n")
+
     return
 
 # Print iterations progress
 # Taken from https://stackoverflow.com/questions/3173320/text-progress-bar-in-terminal-with-block-characters
-
-
 def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
     percent = ("{0:." + str(decimals) + "f}").format(100 *
                                                      (iteration / float(total)))
@@ -79,7 +76,13 @@ if __name__ == "__main__":
         printProgressBar(iteration=progress, total=prompts.__len__())
 
     # Store results in zipfile
-    with zipfile.ZipFile('generated_programs.zip', 'w') as output_file:
+
+    if(len(sys.argv) >= 2):
+      outstr = sys.argv[2]
+    else:
+      outstr = 'generated_files.zip'
+
+    with zipfile.ZipFile(outstr, 'w') as output_file:
         for entry in gen:
             output_file.writestr(entry[0]['name'], str(entry[1]))
             output_file.writestr(str(entry[0]['name']).replace(

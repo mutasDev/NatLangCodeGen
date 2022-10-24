@@ -109,6 +109,10 @@ function buildGeneratedCode(
       break;
     case ProgrammingLanguage.PYTHON:
       delimit = '\n#'
+      break;
+    case ProgrammingLanguage.JAVA:
+      delimit = '\n//'
+      break;
   }
   let genArray: string = prompt.text ? prompt.text.split('\n').join(delimit) : (delimit +  'empty');
   gen = genArray + '\n' + (result ? result : 'empty');
