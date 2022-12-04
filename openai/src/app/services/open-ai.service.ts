@@ -21,7 +21,7 @@ const openai = new OpenAIApi(configuration);
   providedIn: 'root',
 })
 export class OpenAIService {
-  constructor() { }
+  constructor() {}
 
   selectedFile: any = null;
   selectedScenarioFile: any = null;
@@ -34,7 +34,7 @@ export class OpenAIService {
   nLResults: OAIPrompt[] = [];
   counter: number = 0;
   reportResult: string = '';
-  reportData: string[] = [];
+  reportData: any[] = [];
 
   // debugEntries: any[] = [];
   // debugResults: any[] = [];
@@ -139,13 +139,17 @@ export class OpenAIService {
    * sequentially handles every entity in the jsonObj member variable
    * stores the results in the results member variable
    */
-  generateMultiPrompts(model: number, language: ProgrammingLanguage, overwrite: boolean): Promise<any> {
+  generateMultiPrompts(
+    model: number,
+    language: ProgrammingLanguage,
+    overwrite: boolean
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.jsonObj.length > 0) {
         console.log(this.jsonObj.length);
         let prompts = this.jsonObj.splice(0, 20);
         this.generatePromptBatch(prompts, model, language, overwrite)
-          .then((gen: { code: string | undefined, prompt: OAIPrompt }[]) => {
+          .then((gen: { code: string | undefined; prompt: OAIPrompt }[]) => {
             for (let i = 0; i < prompts.length; i++) {
               this.results.push({
                 prompt: gen[i].prompt,
@@ -155,29 +159,31 @@ export class OpenAIService {
           })
           .then(async () => {
             this.counter += 20;
-            console.log("cnt: ", this.counter);
+            console.log('cnt: ', this.counter);
             if (this.counter >= 100) {
               debugger;
               this.counter = 0;
             }
-            console.log(this.jsonObj.length + 'left')
+            console.log(this.jsonObj.length + 'left');
             return this.generateMultiPrompts(model, language, overwrite);
-          })
+          });
       }
     });
   }
 
-  public async generatePromptBatch(input: OAIPrompt[], model: number, lang: ProgrammingLanguage, overwrite: boolean) {
-
-
+  public async generatePromptBatch(
+    input: OAIPrompt[],
+    model: number,
+    lang: ProgrammingLanguage,
+    overwrite: boolean
+  ) {
     let modeltext: string = '';
     if (model == 1) modeltext = 'code-davinci-002';
     else if (model == 2) modeltext = 'text-davinci-002';
     else {
-      console.log("CONFIG ERROR");
+      console.log('CONFIG ERROR');
       return [];
     }
-
 
     let responses = await openai.createCompletion(modeltext, {
       prompt: input.map((entry) => {
@@ -190,30 +196,36 @@ export class OpenAIService {
       presence_penalty: environment.presence_penalty,
     });
 
-    let retResponses: { code: string | undefined, prompt: OAIPrompt}[] = [];
+    let retResponses: { code: string | undefined; prompt: OAIPrompt }[] = [];
     let choices = responses.data.choices;
     console.table(choices);
     choices?.forEach((resp) => {
-        let ret: {code: string| undefined, prompt: OAIPrompt  } = {code : undefined, prompt: {language: lang, text: ""}};
-        ret.code = resp.text;
-        if(resp.index) {
-          ret.prompt = input[resp.index];
-        }
-        retResponses.push(ret);
+      let ret: { code: string | undefined; prompt: OAIPrompt } = {
+        code: undefined,
+        prompt: { language: lang, text: '' },
+      };
+      ret.code = resp.text;
+      if (resp.index) {
+        ret.prompt = input[resp.index];
+      }
+      retResponses.push(ret);
     });
 
     return retResponses;
   }
 
-
-  public preparePromptText(text: string | undefined, lang: ProgrammingLanguage): string{
-    let modifiedPrompt: string = "";
-    if(!text) {
-      return ""
+  public preparePromptText(
+    text: string | undefined,
+    lang: ProgrammingLanguage
+  ): string {
+    let modifiedPrompt: string = '';
+    if (!text) {
+      return '';
     }
     modifiedPrompt = text;
-    modifiedPrompt = environment.pretext + "\n" + modifiedPrompt + "\n" + environment.posttext;
-    modifiedPrompt = modifiedPrompt.replace("[PROGLANG]", lang);
+    modifiedPrompt =
+      environment.pretext + '\n' + modifiedPrompt + '\n' + environment.posttext;
+    modifiedPrompt = modifiedPrompt.replace('[PROGLANG]', lang);
     return modifiedPrompt;
   }
 
@@ -241,8 +253,8 @@ export class OpenAIService {
           console.log(
             'lang: ',
             file.name.endsWith('py') ||
-            file.name.endsWith('java') ||
-            file.name.endsWith('.c')
+              file.name.endsWith('java') ||
+              file.name.endsWith('.c')
           );
         }
         if (
@@ -323,7 +335,7 @@ export class OpenAIService {
     });
   }
 
-  uploadDebugs(event: any): void { }
+  uploadDebugs(event: any): void {}
 
   generateDebugs(): Promise<any> {
     throw new Error('Method not implemented.');
@@ -467,12 +479,11 @@ export class OpenAIService {
         let file: JSZip.JSZipObject = entry[1];
         let fileNameSplit: string[] = file.name.split('/');
         let fileName: string = fileNameSplit[fileNameSplit.length - 1];
-
         if (!file.dir && file.name.endsWith('.json')) {
           file.async('string').then((filedata) => {
             let obj = JSON.parse(filedata);
             console.log(obj);
-            this.reportData.push(makeCSVString(obj));
+            this.reportData.push(obj);
           });
         }
       });
@@ -483,6 +494,7 @@ function makeCSVString(obj: any): string {
   let csvstring: string = '';
   csvstring += obj.language + ',';
   csvstring += obj.name + ',';
+  csvstring += obj.text.replace(/\,/g,'') + ',';
   csvstring += obj.naturalness + ',';
   csvstring += obj.expressiveness + ',';
   csvstring += obj.contentadequacy + ',';

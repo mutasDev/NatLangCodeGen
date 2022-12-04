@@ -62,12 +62,15 @@ export class MultiPromptComponent implements OnInit {
           ? result.prompt.name
           : counter.toLocaleString('en-US', { minimumIntegerDigits: 3 }) +
             '_scen.helper'; // helper fileending because its removed in the next step for all non helper files.
+      if(filenamestring.includes('_scen.helper')) {
+        console.table(result);
+      }
       let filenamestringarray = filenamestring.split('.');
       filenamestringarray = filenamestringarray.slice(0, -1);
       filenamestring = filenamestringarray[0] + "." + getFileNameEnding(lang);
       this.jszip = this.jszip.file(
         filenamestring,
-        buildGeneratedCode(result.prompt, result.result)
+        buildGeneratedCode(result.prompt, result.result, this.generationLanguage)
       );
       counter++;
     });
@@ -105,22 +108,30 @@ function getEnvText(): string {
 }
 function buildGeneratedCode(
   prompt: OAIPrompt,
-  result: string | undefined
+  result: string | undefined,
+  lang: ProgrammingLanguage
 ): string {
   //todo: support for the other languages as well
   let gen: string = '';
   let delimit: string = '';
-  switch (prompt.language) {
+  switch (lang) {
     case ProgrammingLanguage.C:
       delimit = '\n//';
       break;
     case ProgrammingLanguage.PYTHON:
+      console.log("pydelimit");
       delimit = '\n#';
       break;
     case ProgrammingLanguage.JAVA:
       delimit = '\n//';
       break;
-  }
+    case ProgrammingLanguage.CPP:
+      delimit = '\n//'
+      break;
+    case ProgrammingLanguage.TS:
+      delimit = '\n//'
+      break;
+    }
   let genArray: string = prompt.text
     ? prompt.text.split('\n').join(delimit)
     : delimit + 'empty';
