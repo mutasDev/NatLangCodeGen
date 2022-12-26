@@ -46,7 +46,7 @@ Currently, four Features are enabled:
       + After the generation is done (currently only visible in the developer console of the browser) the *save Zip* button saves a zip archive conttaining the generated source files, file format depends on the language field in the respective json entry of the prompt
       
    3. Scenario Translation
-      + Sends multiple completion requests to the Codex API sequentially and stores the results in generated json files
+      + Sends multiple completion requests to the Codex API sequentially and stores the results in generated json files (ATTENTION: only files that contain the string "experiment" are included in the parsing process and will be translated)
       + uses the parameters with nl_ prefix from the [environment file](/src/environments/environment.ts)
       + returns a zip archive containing the generated responses in json formats, exact json format see below
       + The *Generate* button starts the sequential handling of the requests
